@@ -120,7 +120,6 @@ schoolnet/
 ├── tests/                        # Automated regression tests
 ├── requirements.txt              # Python dependencies
 ├── Procfile                       # Render/Gunicorn command using $PORT
-├── Dockerfile                    # Container definition
 ├── .env.example                   # Safe configuration template
 ├── .python-version                # Python runtime version
 ├── .gitignore                     # Secrets, runtime data, and caches
