@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+{% block title %}Sign in · Dessie Special Boarding School{% endblock %}
+{% block breadcrumb %}Member sign in{% endblock %}
+{% block content %}
+<section class="auth-page">
+  <p class="eyebrow">WELCOME BACK · YWMDSBS DESSIE</p><h1>Sign in to SchoolNet</h1><p class="page-intro">Browse the Dessie Special Boarding School community and take part in the conversation.</p>
+  <div class="school-identity-banner"><strong>Dessie Special Boarding School</strong><span>YWMDSBS Dessie</span></div>
+  <form method="post" action="{{ url_for('auth.login') }}" class="stacked-form auth-form" novalidate>
+    {{ form.hidden_tag() }}
+    <div class="field-group"><label for="login-email">Email address</label>{{ form.email(id="login-email", class_="form-control", type="email", autocomplete="email", required=true, data_persist_email="true") }}{% for error in form.email.errors %}<span class="field-error">{{ error }}</span>{% endfor %}</div>
+    <div class="field-group"><label for="login-password">Password</label>{{ form.password(id="login-password", class_="form-control", autocomplete="current-password", required=true) }}{% for error in form.password.errors %}<span class="field-error">{{ error }}</span>{% endfor %}</div>
+    <div class="remember-row">{{ form.remember_me(class_="remember-control") }}{{ form.remember_me.label(class_="remember-label") }}</div>
+    {% if form.errors and not form.email.errors and not form.password.errors %}<p class="form-error" role="alert">Please check your details and try again.</p>{% endif %}
+    <button class="primary-button" type="submit">Sign in</button>
+  </form>
+  <p class="auth-switch">New to the community? <a href="{{ url_for('auth.signup') }}">Create an account</a></p>
+  <p class="auth-privacy">Your account credentials are private and are never shown on community posts or profiles.</p>
+</section>
+{% endblock %}

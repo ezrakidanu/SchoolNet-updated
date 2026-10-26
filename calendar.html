@@ -1,0 +1,9 @@
+{% extends "base.html" %}
+{% from "_macros.html" import icon %}
+{% block title %}School calendar · SchoolNet{% endblock %}
+{% block breadcrumb %}School calendar{% endblock %}
+{% block content %}
+<section class="welcome-heading"><div><p class="eyebrow">MAKE ROOM FOR WHAT’S NEXT</p><h1>School calendar</h1><p>A little planning. A lot to look forward to.</p></div></section>
+<form class="search-box calendar-search" action="{{ url_for('main.calendar') }}" method="get" role="search">{{ icon('search') }}<label class="sr-only" for="calendar-search">Search calendar events</label><input id="calendar-search" type="search" name="q" value="{{ request.args.get('q', '') }}" placeholder="Search events or locations"></form>
+{% if events %}<ol class="calendar-list">{% for event in events %}<li class="calendar-card"><div class="date-block" aria-label="{{ event.starts_at.strftime('%B %-d') if event.starts_at.strftime is defined else event.starts_at }}"><span class="month">{{ event.starts_at.strftime('%b') if event.starts_at.strftime is defined else '' }}</span><span class="day">{{ event.starts_at.strftime('%-d') if event.starts_at.strftime is defined else event.starts_at }}</span></div><div class="calendar-event"><p class="eyebrow">{{ event.category }}</p><h2>{{ event.title }}</h2><p>{{ event.description }}</p><div class="calendar-meta"><span>{{ icon('clock') }} {{ event.time }}</span><span>{{ icon('location') }} {{ event.location }}</span></div></div></li>{% endfor %}</ol>{% else %}<section class="empty-state"><h2>No events found.</h2><p>Try changing your search or check back for new dates.</p><a class="secondary-button" href="{{ url_for('main.calendar') }}">View all dates</a></section>{% endif %}
+{% endblock %}

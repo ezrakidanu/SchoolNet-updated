@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% from "_macros.html" import icon, avatar %}
+{% block title %}{{ post.title }} · SchoolNet{% endblock %}
+{% block breadcrumb %}Community update{% endblock %}
+{% block content %}
+<div class="narrow-content">
+  <a class="back-link" href="{{ url_for('main.index') }}">← Back to community feed</a>
+  <article class="post-card detail-card">
+    {% if post.pinned %}<div class="pinned-band">{{ icon('pin') }} PINNED UPDATE</div>{% endif %}
+    <div class="post-main">
+      <div class="post-author-row"><a class="author-button" href="{{ url_for('main.profile', profile_id=post.profile.id) }}">{{ avatar(post.author_initials) }}<span><strong class="author-name">{{ post.author_name }}</strong><small class="author-meta">{{ post.author_role }} · <time datetime="{{ post.created_at.isoformat() if post.created_at.strftime is defined else post.created_at }}">{{ post.created_at.strftime('%b %-d, %Y · %I:%M %p') if post.created_at.strftime is defined else post.created_at }}</time></small></span></a><span class="post-category">{{ post.category }}</span></div>
+      <h1 class="post-title">{{ post.title }}</h1><p class="post-content detail-copy">{{ post.content }}</p>
+      {% if post.image_path %}<figure class="post-image"><img src="{{ url_for('static', filename=post.image_path) }}" alt="School community activity" loading="lazy"></figure>{% elif post.category == 'Clubs' %}<figure class="post-image"><img src="{{ url_for('static', filename='images/science-lab.jpg') }}" alt="Microscope and lab equipment in a science room" loading="lazy"></figure>{% endif %}
+    </div>
+    <div class="post-footer">
+      {% if current_user and current_user.is_authenticated %}<form method="post" action="{{ url_for('main.toggle_like', post_id=post.id) }}" class="inline-form">{{ logout_form.hidden_tag() }}<button class="post-action" type="submit">{{ icon('heart') }} <span>{{ post.likes|length }} reactions</span></button></form>{% else %}<a class="post-action" href="{{ url_for('auth.login') }}">{{ icon('heart') }} <span>{{ post.likes|length }} reactions · Sign in to react</span></a>{% endif %}
+      <span class="post-action">{{ icon('comment') }} <span>{{ post.comments|length }} comments</span></span>
+    </div>
+  </article>
+  <section class="comments-section" id="conversation" aria-labelledby="comments-title">
+    <div class="section-heading"><div><p class="eyebrow">COMMUNITY CONVERSATION</p><h2 id="comments-title">Comments</h2></div><span class="comment-count">{{ post.comments|length }}</span></div>
+    {% if current_user and current_user.is_authenticated %}
+      <form method="post" action="{{ url_for('main.add_comment', post_id=post.id) }}" class="comment-form stacked-form">
+        {{ comment_form.hidden_tag() }}
+        <div class="field-group"><label for="comment-content">Add a comment as {{ current_user.name }}</label>{{ comment_form.content(id="comment-content", class_="form-control", rows="3", maxlength="500", required=true, placeholder="Keep it kind. Keep it helpful.") }}{% for error in comment_form.content.errors %}<span class="field-error">{{ error }}</span>{% endfor %}</div>
+        <button class="primary-button" type="submit">Post comment</button>
+      </form>
+    {% else %}<p class="auth-hint">Sign in with a member account to comment or react.</p><a class="secondary-button" href="{{ url_for('auth.login') }}">Sign in to join the conversation</a>{% endif %}
+    {% if post.comments %}<ol class="comment-list">{% for comment in post.comments %}<li class="comment-item"><div class="comment-author"><strong>{{ comment.user.name if comment.user else comment.author_name }}</strong>{% if comment.created_at %}<time datetime="{{ comment.created_at.isoformat() if comment.created_at.strftime is defined else comment.created_at }}">{{ comment.created_at.strftime('%b %-d, %Y') if comment.created_at.strftime is defined else comment.created_at }}</time>{% endif %}</div><p>{{ comment.content }}</p></li>{% endfor %}</ol>{% else %}<p class="empty-comments">Be the first to add a little encouragement.</p>{% endif %}
+  </section>
+</div>
+{% endblock %}

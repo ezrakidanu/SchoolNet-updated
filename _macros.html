@@ -1,0 +1,22 @@
+{% macro icon(name, extra_class='') -%}
+<svg class="icon {{ extra_class }}" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+  {% if name == 'home' %}<path d="m3 10 9-7 9 7v10a1 1 0 0 1-1 1h-5v-7H9v7H4a1 1 0 0 1-1-1z"/>
+  {% elif name == 'users' %}<path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2m20 0v-2a4 4 0 0 0-3-3.87"/><circle cx="9" cy="7" r="4"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+  {% elif name == 'calendar' %}<rect x="3" y="5" width="18" height="16" rx="2"/><path d="M16 3v4M8 3v4M3 11h18"/>
+  {% elif name == 'search' %}<circle cx="10.5" cy="10.5" r="6.5"/><path d="m16 16 5 5"/>
+  {% elif name == 'heart' %}<path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.7l-1.1-1.1a5.5 5.5 0 0 0-7.8 7.8L12 21l8.8-8.6a5.5 5.5 0 0 0 0-7.8z"/>
+  {% elif name == 'comment' %}<path d="M21 11.5a8.5 8.5 0 0 1-8.5 8.5 9 9 0 0 1-4-.9L3 21l1.9-5.5a9 9 0 0 1-.9-4 8.5 8.5 0 0 1 17 0z"/>
+  {% elif name == 'plus' %}<path d="M12 5v14M5 12h14"/>
+  {% elif name == 'arrow-right' %}<path d="M4 12h16m-6-6 6 6-6 6"/>
+  {% elif name == 'pin' %}<path d="m16 3 5 5-4 2-2 5-2 1-5-5 1-2 5-2zM8 16l-5 5"/>
+  {% elif name == 'location' %}<path d="M20 10c0 6-8 12-8 12S4 16 4 10a8 8 0 0 1 16 0z"/><circle cx="12" cy="10" r="3"/>
+  {% elif name == 'clock' %}<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>
+  {% elif name == 'logout' %}<path d="M9 21H4V3h5m6 5 4 4-4 4M8 12h12"/>
+  {% elif name == 'school' %}<path d="m3 10 9-7 9 7M5 9v12h14V9m-9 12v-6h4v6M9 10h6"/>
+  {% else %}<circle cx="12" cy="12" r="9"/>{% endif %}
+</svg>
+{%- endmacro %}
+
+{% macro avatar(initials, extra_class='') -%}
+<span class="avatar {{ extra_class }}" aria-hidden="true">{{ initials or 'SN' }}</span>
+{%- endmacro %}

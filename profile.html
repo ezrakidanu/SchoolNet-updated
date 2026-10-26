@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+{% from "_macros.html" import avatar %}
+{% block title %}{{ profile.name }} · SchoolNet{% endblock %}
+{% block breadcrumb %}People / {{ profile.name }}{% endblock %}
+{% block content %}
+<div class="narrow-content">
+  <a class="back-link" href="{{ url_for('main.people') }}">← All people</a>
+  <article class="profile-detail-card">{{ avatar(profile.initials, 'profile-detail-avatar') }}<p class="eyebrow">{{ profile.department }}</p><h1>{{ profile.name }}</h1><p class="profile-role">{{ profile.role }}</p><p class="profile-bio">{{ profile.bio }}</p></article>
+  {% if posts is defined and posts %}<section class="related-posts"><div class="section-heading"><h2>Community updates</h2></div><ul>{% for post in posts %}<li><a href="{{ url_for('main.post_detail', post_id=post.id) }}"><strong>{{ post.title }}</strong><span>{{ post.category }} · {{ post.created_at.strftime('%b %-d, %Y') if post.created_at.strftime is defined else post.created_at }}</span></a></li>{% endfor %}</ul></section>{% endif %}
+</div>
+{% endblock %}

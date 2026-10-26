@@ -1,0 +1,91 @@
+{% from "_macros.html" import icon, avatar %}
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#39735b">
+  <meta name="description" content="SchoolNet connects Dessie Special Boarding School (YWMDSBS Dessie) with school announcements, staff updates, and community moments.">
+  <title>{% block title %}SchoolNet · Dessie Special Boarding School{% endblock %}</title>
+  <link rel="icon" type="image/svg+xml" href="{{ url_for('static', filename='images/logo.svg') }}">
+  <link rel="manifest" href="/manifest.webmanifest">
+  <link rel="apple-touch-icon" href="{{ url_for('static', filename='images/pwa-180.png') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+  <script defer src="{{ url_for('static', filename='js/icons.js') }}"></script>
+  <script defer src="{{ url_for('static', filename='js/app.js') }}"></script>
+</head>
+<body>
+  <a class="skip-link" href="#main-content">Skip to content</a>
+  <aside class="sidebar" aria-label="Main navigation">
+    <a class="brand" href="{{ url_for('main.index') }}" aria-label="SchoolNet home">
+      <img src="{{ url_for('static', filename='images/logo.svg') }}" alt="" width="36" height="36">
+      <span>SchoolNet<span class="brand-dot">.</span></span>
+    </a>
+    <div class="school-label"><span class="school-symbol">{{ icon('school') }}</span><div>Dessie Special Boarding School<small>YWMDSBS Dessie</small></div></div>
+    <nav class="main-nav" aria-label="SchoolNet">
+      <a class="nav-item {% if request.endpoint == 'main.index' %}active{% endif %}" href="{{ url_for('main.index') }}">{{ icon('home') }}<span>Community feed</span></a>
+      <a class="nav-item {% if request.endpoint == 'main.people' or request.endpoint == 'main.profile' %}active{% endif %}" href="{{ url_for('main.people') }}">{{ icon('users') }}<span>People</span></a>
+      <a class="nav-item {% if request.endpoint == 'main.calendar' %}active{% endif %}" href="{{ url_for('main.calendar') }}">{{ icon('calendar') }}<span>School calendar</span></a>
+    </nav>
+    <p class="space-heading">YOUR SPACES</p>
+    <nav class="spaces-nav" aria-label="Filter feed by category">
+      {% for category in categories %}
+      <a href="{{ url_for('main.index', category=category) }}" class="space-link"><span class="space-dot space-dot-{{ loop.index }}"></span>{{ category }}</a>
+      {% endfor %}
+    </nav>
+    <div class="sidebar-bottom">
+      <p class="connected-note"><span class="online-dot"></span>A little closer, every day.</p>
+      {% if current_user and current_user.is_authenticated %}
+        <div class="account-summary">{{ avatar(current_user.initials, 'account-avatar') }}<span><strong>{{ current_user.name }}</strong><small>{{ current_user.role }}</small></span></div>
+        <form class="logout-form" method="post" action="{{ url_for('auth.logout') }}">
+          {{ logout_form.hidden_tag() }}
+          <button class="text-button logout-button" type="submit">{{ icon('logout') }} Sign out</button>
+        </form>
+      {% else %}
+        <div class="account-summary">{{ avatar('SN', 'account-avatar') }}<span><strong>Community reader</strong><small>Browse your school</small></span></div>
+        <a class="text-button sign-in-link" href="{{ url_for('auth.login') }}">Sign in</a>
+      {% endif %}
+    </div>
+  </aside>
+
+  <div class="workspace">
+    <header class="topbar">
+      <a class="mobile-brand" href="{{ url_for('main.index') }}" aria-label="SchoolNet for Dessie Special Boarding School"><img src="{{ url_for('static', filename='images/logo.svg') }}" width="31" height="31" alt=""><span>SchoolNet.<small>Dessie Special Boarding School</small></span></a>
+      <div class="breadcrumb"><span>{% block breadcrumb %}Dessie Special Boarding School{% endblock %}</span><span class="header-divider" aria-hidden="true"></span><span class="school-badge">YWMDSBS Dessie</span></div>
+      <div class="topbar-actions">
+        {% block search %}
+        <form class="search-box" action="{{ url_for('main.index') }}" method="get" role="search">
+          <label class="sr-only" for="site-search">Search school updates</label>{{ icon('search') }}
+          <input id="site-search" name="q" type="search" value="{{ request.args.get('q', '') }}" placeholder="Search your community">
+          {% if request.args.get('category') %}<input type="hidden" name="category" value="{{ request.args.get('category') }}">{% endif %}
+        </form>
+        {% endblock %}
+        {% if current_user and current_user.is_authenticated %}{{ avatar(current_user.initials, 'top-avatar') }}{% else %}<a class="account-link" href="{{ url_for('auth.login') }}">Sign in</a>{% endif %}
+      </div>
+    </header>
+
+    <main id="main-content" class="page-content" tabindex="-1">
+      {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}<div class="flash-list" aria-live="polite">{% for category, message in messages %}<p class="flash flash-{{ category }}">{{ message }}</p>{% endfor %}</div>{% endif %}
+      {% endwith %}
+      {% block content %}{% endblock %}
+    </main>
+    <footer class="site-footer"><span>Made for the Dessie Special Boarding School community.</span><span>Sole creator, developer &amp; author: <strong>Ezra Kidanu</strong></span></footer>
+  </div>
+
+  <nav class="mobile-nav" aria-label="Mobile navigation">
+    <a class="{% if request.endpoint == 'main.index' %}active{% endif %}" href="{{ url_for('main.index') }}">{{ icon('home') }}<span>Feed</span></a>
+    <a class="{% if request.endpoint == 'main.people' or request.endpoint == 'main.profile' %}active{% endif %}" href="{{ url_for('main.people') }}">{{ icon('users') }}<span>People</span></a>
+    <a class="mobile-publish" href="{% if current_user and current_user.is_authenticated %}{{ url_for('main.index') }}#publish{% else %}{{ url_for('auth.login') }}{% endif %}" {% if current_user and current_user.is_authenticated %}data-publish-focus{% endif %} aria-label="{% if current_user and current_user.is_authenticated %}Create a post{% else %}Sign in to publish{% endif %}">{{ icon('plus') }}</a>
+    <a class="{% if request.endpoint == 'main.calendar' %}active{% endif %}" href="{{ url_for('main.calendar') }}">{{ icon('calendar') }}<span>Calendar</span></a>
+  </nav>
+
+  <aside class="pwa-install-banner" data-pwa-banner aria-label="Install SchoolNet" hidden>
+    <img src="{{ url_for('static', filename='images/pwa-192.png') }}" width="40" height="40" alt="">
+    <div class="pwa-install-copy"><strong>Install SchoolNet</strong><span data-pwa-message>Keep your school community one tap away.</span><span class="pwa-instructions" data-pwa-instructions hidden>In Chrome, open the ⋮ menu and choose “Install app” or “Add to Home screen”.</span></div>
+    <button class="primary-button" data-pwa-install type="button">Install</button>
+    <button class="pwa-dismiss-button" data-pwa-dismiss type="button" aria-label="Dismiss install suggestion">×</button>
+  </aside>
+  <noscript><p class="noscript-notice">SchoolNet works without JavaScript. Live publishing, comments, and reactions require a connection.</p></noscript>
+</body>
+</html>

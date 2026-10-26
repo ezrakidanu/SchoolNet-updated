@@ -1,0 +1,4 @@
+{% extends "base.html" %}
+{% block title %}Something went wrong · SchoolNet{% endblock %}
+{% block breadcrumb %}Something went wrong{% endblock %}
+{% block content %}<section class="error-page"><p class="eyebrow">PLEASE TRY AGAIN</p><h1>We hit a brief snag.</h1><p>Your community information is still private. Please try again in a moment.</p><a class="primary-button" href="{{ url_for('main.index') }}">Return to SchoolNet</a></section>{% endblock %}

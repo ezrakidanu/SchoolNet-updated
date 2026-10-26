@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+{% block title %}Join Dessie Special Boarding School · SchoolNet{% endblock %}
+{% block breadcrumb %}Create an account{% endblock %}
+{% block content %}
+<section class="auth-page">
+  <p class="eyebrow">A PLACE FOR EVERYONE · YWMDSBS DESSIE</p><h1>Join Dessie Special Boarding School</h1><p class="page-intro">Create a SchoolNet member account to publish updates, react, and join conversations.</p>
+  <div class="school-identity-banner"><strong>Dessie Special Boarding School</strong><span>YWMDSBS Dessie</span></div>
+  <form method="post" action="{{ url_for('auth.signup') }}" class="stacked-form auth-form" novalidate>
+    {{ form.hidden_tag() }}
+    <div class="field-group"><label for="signup-name">Your name</label>{{ form.name(id="signup-name", class_="form-control", autocomplete="name", maxlength="120", required=true) }}{% for error in form.name.errors %}<span class="field-error">{{ error }}</span>{% endfor %}</div>
+    <div class="field-group"><label for="signup-email">Email address</label>{{ form.email(id="signup-email", class_="form-control", type="email", autocomplete="email", required=true, data_persist_email="true") }}{% for error in form.email.errors %}<span class="field-error">{{ error }}</span>{% endfor %}</div>
+    <div class="field-group"><label for="signup-password">Password</label>{{ form.password(id="signup-password", class_="form-control", autocomplete="new-password", required=true, aria_describedby="password-help") }}<small id="password-help" class="field-help">Choose a strong password that you do not use elsewhere.</small>{% for error in form.password.errors %}<span class="field-error">{{ error }}</span>{% endfor %}</div>
+    <div class="field-group"><label for="signup-confirm-password">Confirm password</label>{{ form.confirm_password(id="signup-confirm-password", class_="form-control", autocomplete="new-password", required=true) }}{% for error in form.confirm_password.errors %}<span class="field-error">{{ error }}</span>{% endfor %}</div>
+    <button class="primary-button" type="submit">Create account</button>
+  </form>
+  <p class="auth-switch">Already a member? <a href="{{ url_for('auth.login') }}">Sign in</a></p>
+  <p class="auth-privacy">Your email and password stay private; your registered name is used when you publish or comment.</p>
+</section>
+{% endblock %}

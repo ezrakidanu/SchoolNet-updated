@@ -1,0 +1,9 @@
+{% extends "base.html" %}
+{% from "_macros.html" import avatar, icon %}
+{% block title %}People · SchoolNet{% endblock %}
+{% block breadcrumb %}People{% endblock %}
+{% block content %}
+<section class="welcome-heading"><div><p class="eyebrow">THE PEOPLE BEHIND THE POSSIBILITIES</p><h1>Meet your school community.</h1><p>Teachers and staff shaping the moments that matter.</p></div></section>
+<div class="people-toolbar"><form class="search-box directory-search" action="{{ url_for('main.people') }}" method="get" role="search">{{ icon('search') }}<label class="sr-only" for="people-search">Search people</label><input id="people-search" type="search" name="q" value="{{ request.args.get('q', '') }}" placeholder="Search names, subjects, roles"></form></div>
+{% if profiles %}<div class="people-grid">{% for profile in profiles %}<article class="profile-card">{{ avatar(profile.initials, 'profile-avatar') }}<p class="eyebrow">{{ profile.department }}</p><h2><a href="{{ url_for('main.profile', profile_id=profile.id) }}">{{ profile.name }}</a></h2><p class="profile-role">{{ profile.role }}</p><p>{{ profile.bio }}</p><a class="text-link" href="{{ url_for('main.profile', profile_id=profile.id) }}">View profile {{ icon('arrow-right') }}</a></article>{% endfor %}</div>{% else %}<section class="empty-state"><h2>No people found.</h2><p>Try a different name, subject, or role.</p><a class="secondary-button" href="{{ url_for('main.people') }}">Clear search</a></section>{% endif %}
+{% endblock %}
