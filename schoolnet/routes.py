@@ -145,7 +145,8 @@ def health():
 
 @main_bp.get("/manifest.webmanifest")
 def manifest():
-    manifest_path = Path(current_app.static_folder) / "manifest.webmanifest"
+    public_root = Path(current_app.static_folder).parent
+    manifest_path = public_root / "manifest.webmanifest"
     response = current_app.response_class(manifest_path.read_bytes(), mimetype="application/manifest+json")
     response.headers["Cache-Control"] = "no-cache"
     return response
@@ -155,7 +156,8 @@ def manifest():
 def service_worker():
     # The checked-in worker is the app-owned source. Strip navigation caching so
     # account/data pages can never be persisted as a shared offline response.
-    worker_path = Path(current_app.static_folder) / "service-worker.js"
+    public_root = Path(current_app.static_folder).parent
+    worker_path = public_root / "service-worker.js"
     source = worker_path.read_text(encoding="utf-8")
     response = current_app.response_class(source, mimetype="application/javascript")
     response.headers["Cache-Control"] = "no-cache"

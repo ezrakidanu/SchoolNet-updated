@@ -69,6 +69,12 @@ Use a managed PostgreSQL database for durable live data and provide its connecti
 
 The application exposes `/health` for a lightweight health check. Verify signup, login, logout, CSRF-protected publishing, reactions, comments, and durable writes in the deployed environment before inviting members.
 
+## Deployment on Vercel
+
+Vercel recognizes the root `app.py` as a Flask entrypoint because it exports the WSGI object as `app`. Its Python runtime sends dynamic requests to this Flask application automatically, so this project does not need an extra `api/index.py` or a catch-all rewrite that could intercept static files. The root `vercel.json` explicitly bundles the Python package, Jinja templates, and public assets for the `app.py` function.
+
+Vercel serves static files from `public/`; this project keeps the existing `/static/...` URLs under `public/static/` and places the root web manifest and service worker directly in `public/`. For Vercel's Production and Preview environments, configure `APP_ENV=production`, a stable high-entropy `SECRET_KEY`, `SESSION_COOKIE_SECURE=true`, and `DATABASE_URL` pointing to a managed PostgreSQL database. Do not commit these values. Vercel function filesystems are read-only except for temporary `/tmp` storage, so the local SQLite fallback is not suitable for Vercel. If `SECRET_KEY` is absent or `DATABASE_URL` is not configured, the function cannot start successfully. Check Vercel Function Logs for the specific startup error when diagnosing `FUNCTION_INVOCATION_FAILED`.
+
 ## Routes and project layout
 
 The page interface is organized around these endpoints:
@@ -110,16 +116,17 @@ schoolnet/
 │   ├── calendar.html             # Event list
 │   ├── 404.html, error.html      # Branded error pages
 │   └── _macros.html              # Inline SVG and avatar macros
-├── static/
-│   ├── css/styles.css            # Standalone responsive sage/mint styling
-│   ├── js/app.js                 # PWA install prompt and service-worker setup
-│   ├── js/icons.js               # Decorative inline-icon semantics
-│   ├── images/                   # Local logo, PWA icons, and Science Club photo
-│   ├── manifest.webmanifest     # Installable app identity
-│   └── service-worker.js         # Static app-shell asset cache only
+├── public/
+│   ├── manifest.webmanifest      # Installable app identity
+│   ├── service-worker.js         # Static app-shell asset cache only
+│   └── static/
+│       ├── css/styles.css        # Standalone responsive sage/mint styling
+│       ├── js/                   # PWA install and icon helpers
+│       └── images/               # Logo, PWA icons, and Science Club photo
 ├── tests/                        # Automated regression tests
 ├── requirements.txt              # Python dependencies
 ├── Procfile                       # Render/Gunicorn command using $PORT
+├── vercel.json                    # Vercel function file inclusion and headers
 ├── .env.example                   # Safe configuration template
 ├── .python-version                # Python runtime version
 ├── .gitignore                     # Secrets, runtime data, and caches

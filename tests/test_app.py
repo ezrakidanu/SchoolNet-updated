@@ -1,11 +1,14 @@
 from __future__ import annotations
 
 import ast
+import json
+import os
 import re
 import shutil
 import tempfile
 import unittest
 from pathlib import Path
+from unittest.mock import patch
 
 from schoolnet import create_app, normalize_database_url
 from schoolnet.models import Comment, Event, Like, Post, Profile, User
@@ -118,7 +121,7 @@ class SchoolNetTests(unittest.TestCase):
         self.assertIn(b'data-persist-email="true"', login_page.data)
         self.assertIn(b'name="remember_me"', login_page.data)
         self.assertIn(b'<input checked', login_page.data)
-        app_script = Path("static/js/app.js").read_text(encoding="utf-8")
+        app_script = Path("public/static/js/app.js").read_text(encoding="utf-8")
         self.assertIn("schoolnet-account-email", app_script)
         self.assertIn("window.localStorage.setItem(emailStorageKey, email)", app_script)
         self.assertIn("input.form?.addEventListener('submit', saveEmail)", app_script)
@@ -217,6 +220,22 @@ class SchoolNetTests(unittest.TestCase):
         self.assertIn("request.mode === 'navigate'", source)
         self.assertIn("url.pathname.startsWith('/posts/')", source)
         self.assertNotIn("await cache.put('/'", source)
+
+    def test_vercel_entrypoint_config_bundles_flask_templates_and_public_assets(self):
+        config = json.loads(Path("vercel.json").read_text(encoding="utf-8"))
+        self.assertEqual(config["functions"]["app.py"]["includeFiles"], "{schoolnet/**,templates/**,public/**}")
+        self.assertIn("app = create_app()", Path("app.py").read_text(encoding="utf-8"))
+        for path in ["/static/css/styles.css", "/static/js/app.js", "/static/images/logo.svg",
+                     "/static/images/pwa-192.png", "/manifest.webmanifest", "/service-worker.js"]:
+            response = self.client.get(path)
+            self.assertEqual(response.status_code, 200, path)
+            response.close()
+
+    def test_vercel_requires_external_database_url(self):
+        with patch.dict(os.environ, {"VERCEL": "1"}, clear=False):
+            with patch.dict(os.environ, {"DATABASE_URL": ""}, clear=False):
+                with self.assertRaisesRegex(RuntimeError, "DATABASE_URL must be configured on Vercel"):
+                    create_app({"TESTING": True, "SECRET_KEY": "vercel-database-test"})
 
     def test_default_database_and_required_route_names(self):
         default_app = create_app({"TESTING": True, "SECRET_KEY": "default-path-test"})

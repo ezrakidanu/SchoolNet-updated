@@ -46,11 +46,15 @@ def create_app(test_config: dict[str, Any] | None = None) -> Flask:
     project_root = Path(__file__).resolve().parent.parent
     app = Flask(__name__, instance_relative_config=True,
                 template_folder=str(project_root / "templates"),
-                static_folder=str(project_root / "static"), static_url_path="/static")
+                static_folder=str(project_root / "public" / "static"), static_url_path="/static")
     instance_path = Path(app.instance_path)
-    instance_path.mkdir(parents=True, exist_ok=True)
-
     database_url = os.environ.get("DATABASE_URL")
+    on_vercel = bool(os.environ.get("VERCEL") or os.environ.get("VERCEL_ENV"))
+    if on_vercel and not database_url:
+        raise RuntimeError("DATABASE_URL must be configured on Vercel; use a persistent PostgreSQL database, not function-local SQLite.")
+    if not on_vercel:
+        instance_path.mkdir(parents=True, exist_ok=True)
+
     app.config.from_mapping(
         SECRET_KEY=os.environ.get("SECRET_KEY"),
         SQLALCHEMY_DATABASE_URI=normalize_database_url(database_url or f"sqlite:///{instance_path / 'schoolnet_standalone.db'}"),
